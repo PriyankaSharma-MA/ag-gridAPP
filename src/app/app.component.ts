@@ -4,6 +4,7 @@ import { Grid, GridOptions } from "ag-grid-community";
 // import "ag-grid/dist/styles/ag-grid.css";
 // import "ag-grid/dist/styles/ag-theme-balham.css";
 import { MasterService } from '../app/_services/masterdata.service'
+import { ProgramList } from '../app/_models/masterdata.model'
 import 'ag-grid-enterprise';
 
 @Component({
@@ -14,7 +15,8 @@ import 'ag-grid-enterprise';
 })
 export class AppComponent implements OnInit {
     private gridOptions: GridOptions = <GridOptions>{};
-
+    selectedView: string = '0';
+    listProgram: ProgramList[];
     title = 'my-app';
     count = 0;
     COUNTRY_CODES = {
@@ -42,6 +44,13 @@ export class AppComponent implements OnInit {
 
     constructor(private masterService: MasterService) {
 
+     
+     this.createGridOption()
+
+
+    }
+    createGridOption()
+    {
         var groupColumn = {
             headerName: "Group",
             width: 200,
@@ -82,8 +91,8 @@ export class AppComponent implements OnInit {
             },
             enableCellChangeFlash: true,
             rowDragManaged: true,
-            pivotMode:true,
-        
+            pivotMode: true,
+
             // popupParent: document.body,
             // ensureDomOrder: true,
             // postProcessPopup: function(params) {
@@ -307,8 +316,6 @@ export class AppComponent implements OnInit {
                 }
             ]
         };
-
-
     }
     GetAllCarTable() {
         this.masterService.GetAllCarTable().subscribe(
@@ -424,24 +431,127 @@ export class AppComponent implements OnInit {
     }
     ngOnInit() {
         this.GetAllCarTable();
+        this.listProgram = [];
+        var temp = []
+        var car = [];
+        car = [{
+            "GRANT VIEW":
+            {
+                "Dimention": ["id", "status", "rohit", "priyanka"],
+                "Measure": ["id", "status", "rohit", "priyanka", "prateek"]
+            },
+            "RESULT VIEW":
+            {
+                "Dimention": ["id", "status", "rohit","prateek"],
+                "Measure": ["id", "status", "rohit", "priyanka", ]
+            }
+        }]
+        for (var i = 0; i < car.length; i++) {
+            console.log(Object.keys(car)[i], Object.values(car)[i])
+            temp = car[i];
+            for (var j = 0; j < Object.keys(temp).length; j++) {
+                console.log(Object.keys(temp)[j], Object.values(temp)[j])
+                this.listProgram.push({
+                    value: Object.keys(temp)[j],
+                    label: Object.keys(temp)[j]
+                });
+            }
+
+        }
+         this.createGrid();
+
+    }
+    createGrid()
+    {
+        
         let eGridDiv: HTMLElement = document.querySelector('#myGrid');
-        // let eGridDiv:HTMLElement = <HTMLElement>document.querySelector('#myGrid');
+
         new Grid(eGridDiv, this.gridOptions);
     }
+    onDropDownChange()
+    {
+     //   alert(this.selectedView)
+        this.createGridOption();
+        this.createGrid();
+    }
+    createColumnDefs()
+    {
+        var temp = []
+        var car = [];
+        var coldef=[];
+        car = [{
+            "GRANT VIEW":
+            {
+                "Dimension": ["make", "model", "price"],
+                "Measure":  ["make", "price"]
+            },
+            "RESULT VIEW":
+            {
+                "Dimension":  ["make1", "model", "price"],
+                "Measure": ["make", "model", "price"]
+            }
+        }]
+        for (var i = 0; i < car.length; i++) {
+            console.log(Object.keys(car)[i], Object.values(car)[i])
+            temp = car[i];
+            for (var j = 0; j < Object.keys(temp).length; j++) {
+                console.log(Object.keys(temp)[j], Object.values(temp)[j])
+                var tempchild = []
+                var child = []
+                if(this.selectedView=='0')
+                {
+                    this.selectedView="GRANT VIEW";
+                }
+                if( Object.keys(temp)[j]==this.selectedView)
+                {
+                  
+                    console.log( Object.values(temp)[j])
+                    tempchild=Object.values(temp)[j];
+                    for (var j = 0; j < Object.keys(tempchild).length; j++) {
+                        //alert(Object.keys(tempchild)[j])
+                        child = []
+                        for(var k=0;k<Object.values(tempchild)[j].length;k++)
+                        {
+                            child.push({
+                                headerName:Object.values(tempchild)[j][k], field: Object.values(tempchild)[j][k]
+                                , width: 120, editable: true, floatCell: true, enableRowGroup: true, enablePivot: true, enableValue: true,
+                
+                                filterParams: {
+                                    selectAllOnMiniFilter: true,
+                                    newRowsAction: 'keep',
+                                    clearButton: true 
+                            }})
+                           // alert(Object.values(tempchild)[j][k])
+                        }
+                        coldef.push({ headerName:Object.keys(tempchild)[j],children:child})
+                    }
+                    
+                }
+               
+            }
+            return coldef;
+
+        }
+    }
+
     // specify the columns
-    createColumnDefs() {
+    createColumnDefsold() {
         return [
             {
-                headerName: "Make", field: "make"
+                headerName: "Athlete Details",
+                children: [
+               { headerName: "Make", field: "make"
                 , width: 120, editable: true, floatCell: true, enableRowGroup: true, enablePivot: true, enableValue: true,
-    
+
                 filterParams: {
                     selectAllOnMiniFilter: true,
                     newRowsAction: 'keep',
                     clearButton: true
-                  
+
                     //, cellRenderer: 'ratingRenderer'
                 }
+            }
+            ]
             },
             {
                 headerName: "Model", field: "model"
@@ -450,7 +560,7 @@ export class AppComponent implements OnInit {
                     selectAllOnMiniFilter: true,
                     newRowsAction: 'keep',
                     clearButton: true,
-                  
+
                     //, cellRenderer: 'ratingRenderer'
                 }
             },
@@ -458,12 +568,12 @@ export class AppComponent implements OnInit {
             {
                 headerName: "Price", field: "price"
                 , width: 120, editable: true, floatCell: true, enableRowGroup: true, enablePivot: true, enableValue: true,
-              
+
                 filterParams: {
                     selectAllOnMiniFilter: true,
                     newRowsAction: 'keep',
                     clearButton: true,
-                  
+
                     //, cellRenderer: 'ratingRenderer'
                 }
             }
