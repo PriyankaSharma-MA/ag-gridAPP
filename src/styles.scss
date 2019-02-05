@@ -2,3 +2,24 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import "~ag-grid-community/dist/styles/ag-grid.css";
 @import "~ag-grid-community/dist/styles/ag-theme-balham.css";
+
+@import "node_modules/bootstrap/scss/bootstrap";
+@import '~bootstrap/scss/bootstrap-reboot';
+@import '~bootstrap/scss/bootstrap-grid';
+.holds-the-iframe {
+    background:url('assets/loader.gif') center center no-repeat;
+   }
+   .headercontainer{
+    font-size: 12px;
+    padding-right: 0px !important;
+    padding-left: 0px !important;
+    width: 100%;
+    /* margin-bottom: 11px; */
+    height: 32px;
+    background: url('assets/fslogo.png') center center no-repeat;
+  
+}
+body{
+    -ms-content-zooming: none;
+}
+

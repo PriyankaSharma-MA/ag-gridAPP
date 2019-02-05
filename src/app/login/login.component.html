@@ -1,0 +1,35 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow" style="padding:0px!important">
+    <img src="{{siteurl}}/assets/fslogo.png" height="50px" width="100%" alt="image">
+   
+</nav>
+<div class="app flex-row align-items-center background" style="padding-top: 150px !important;background-image: '../../assets/background.png'">
+    <div class="container">
+        <div class="row justify-content-center vertical-center">
+            <div class="col-md-4">
+                <div class="card-group shadow">
+                    <div class="card p-4" style="background-color:#e6e6e6d6 !important;margin-bottom: 0px !important; padding-bottom: 0px !important;">
+                        <h6 style="text-align: center;">
+                          Foundation Source
+                            <!-- <img src="{{siteurl}}/assets/OTIS.png" height="20" width="auto" alt="image"> -->
+                            <br /> </h6>
+                        <div class="card-body" style="color:#20a8d8 !important;">
+                            <div class="input-group mb-3" style="margin-bottom: 1.5em !important">
+                                <span class="ui-float-label" style="width:100% !important">
+                                    <input id="float-input"  [(ngModel)]="foundationId" type="text"  style="width: 100% !important" pInputText>
+                                    <label for="float-input">Please enter foundation id</label>
+                                </span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <button   type="button" value="Login" (click)="login()" class="btn btn-primary px-4 button-round-corners button-width">submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

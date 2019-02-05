@@ -7,7 +7,7 @@ export const environment = {
   //,apiurl:"http://localhost:63562/api/CSV/",
   //siteurl:"http://localhost:63562/api/CSV/"
   ,apiurl:"http://localhost:59261/api/Report/",
-  siteurl:"http://localhost:59261/api/Report"
+  siteurl:"http://localhost:4200/"
 };
 
 /*

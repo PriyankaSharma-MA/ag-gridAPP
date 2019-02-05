@@ -13,15 +13,58 @@ export class MasterService {
 
     //Mention API URL
     private webApiUrl = environment.apiurl;
-    
-    GetAllCarTable(): Observable<[]> {
+
+    SaveGridViewState(InputGridViewstate) {
+        //Create header object
+        let headers = new HttpHeaders();
+        //Mention http header details
+        let finalheaders = headers.append('Content-Type', 'application/json');
+        finalheaders.append("Access-Control-Allow-Origin", "true")
+
+        let body = JSON.stringify(InputGridViewstate);
+        //Call the put function
+        return this.http.post<any>(this.webApiUrl + "SavegridViewState", body, { headers: finalheaders })
+            //.catch(this.handleError)
+            ;
+    }
+    GetgridViewState(): Observable<[]> {
         //Create header object
         let headers = new HttpHeaders();
         //Mention http header details
         let finalheaders = headers.append('Content-Type', 'application/json');
         finalheaders.append("Access-Control-Allow-Origin", "true")
         //Call the get function
-        return this.http.get<[]>(this.webApiUrl + "GetAllCarTable" , { headers: finalheaders })
+        return this.http.get<[]>(this.webApiUrl + "GetgridViewState", { headers: finalheaders })
+           // .catch(this.handleError);
+    }
+    GetGridViewData(foundationId,viewId): Observable<[]> {
+        //Create header object
+        let headers = new HttpHeaders();
+        //Mention http header details
+        let finalheaders = headers.append('Content-Type', 'application/json');
+        finalheaders.append("Access-Control-Allow-Origin", "true")
+        //Call the get function
+        return this.http.get<[]>(this.webApiUrl + "GetGridViewData?foundationId="+ foundationId  + "&viewId=" +viewId , { headers: finalheaders })
+           // .catch(this.handleError);
+    }
+    GetGridViewStructure(): Observable<[]> {
+        //Create header object
+        let headers = new HttpHeaders();
+        //Mention http header details
+        let finalheaders = headers.append('Content-Type', 'application/json');
+        finalheaders.append("Access-Control-Allow-Origin", "true")
+        //Call the get function
+        return this.http.get<[]>(this.webApiUrl + "GetGridViewStructure" , { headers: finalheaders })
+           // .catch(this.handleError);
+    }
+    GetFoundationName(foundationId): Observable<[]> {
+        //Create header object
+        let headers = new HttpHeaders();
+        //Mention http header details
+        let finalheaders = headers.append('Content-Type', 'application/json');
+        finalheaders.append("Access-Control-Allow-Origin", "true")
+        //Call the get function
+        return this.http.get<[]>(this.webApiUrl + "GetFoundationName?foundationId="+ foundationId   , { headers: finalheaders })
            // .catch(this.handleError);
     }
     //Error Handling

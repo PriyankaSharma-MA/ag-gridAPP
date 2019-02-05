@@ -1,21 +1,2 @@
-<div id="example-wrapper">
-    <div id="example-toolbar">
-        <div class="col-sm-12" style="padding:0px;">
-            <mat-form-field>
-                <mat-select   [(value)]="selectedView" (selectionChange)="onDropDownChange()" name="selectedView" placeholder="Select a view">
 
-                    <mat-option #allregionSelected [value]="0">All</mat-option>
-                    <mat-option *ngFor="let Region of listProgram" [value]="Region.value" >
-
-                        {{Region.value}}
-
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
-         </div>
-    </div>
-
-    <div id="grid-wrapper">
-        <div id="myGrid" style="height: 600px;" class="ag-theme-balham"></div>
-    </div>
-</div>
+<router-outlet></router-outlet>
