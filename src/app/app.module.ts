@@ -11,7 +11,7 @@ import 'ag-grid-enterprise';
 import {LicenseManager} from "ag-grid-enterprise";
 import { LoginComponent } from './login/login.component';
 import { ViewComponent } from './view/view.component';
-
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { AppRoutingModule }        from './app-routing.module';
 import { AuthGuard } from './_guards/auth.guard';
 LicenseManager.setLicenseKey("Foundation_Source_Philanthropic_Inc__Foundation_Source___3Devs2_SaaS_21_December_2019__MTU3Njg4NjQwMDAwMA==ee8b7707231e7b40f6e71ec9bf87a7f1");
@@ -33,6 +33,7 @@ LicenseManager.setLicenseKey("Foundation_Source_Philanthropic_Inc__Foundation_So
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
+    NgxMatSelectSearchModule,
     AgGridModule.withComponents([])
   
   ],

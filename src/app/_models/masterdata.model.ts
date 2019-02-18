@@ -1,11 +1,8 @@
 
-// export class InputGridViewstate {
-//     ReportID: number;
-//     TaskID: number;
-//     UserID: number;
-//     IsSubscribed: number;
-//     ReportDetailsID: number;
-// }
+export class FoundationList {
+   Foundation_Id: number;
+   Foundation_Name: string;
+}
 
 
 export class InputGridViewstate {

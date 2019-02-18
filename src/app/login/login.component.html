@@ -14,10 +14,26 @@
                             <br /> </h6>
                         <div class="card-body" style="color:#20a8d8 !important;">
                             <div class="input-group mb-3" style="margin-bottom: 1.5em !important">
-                                <span class="ui-float-label" style="width:100% !important">
+                                <!-- <span class="ui-float-label" style="width:100% !important">
                                     <input id="float-input"  [(ngModel)]="foundationId" type="text"  style="width: 100% !important" pInputText>
                                     <label for="float-input">Please enter foundation id</label>
-                                </span>
+                                </span> -->
+
+                                <form [formGroup]="searchFoundation" fxFlex fxLayout="column" autocomplete="off">
+                                        <mat-form-field>
+                                            <mat-select formControlName="foundation"  [(ngModel)]="selectedFoundation" name="selectedFoundation"
+                                                placeholder="Select a foundation name">
+                                                <ngx-mat-select-search placeholderLabel="Search" noEntriesFoundLabel="No options found" [formControl]="foundationFilterCtrl"></ngx-mat-select-search>
+
+                                                <!-- <mat-option #allViewSelected [value]="0" (click)="toggleAllSelection()">All</mat-option> -->
+                                                <mat-option *ngFor="let foundation of filteredlistFoundation" [value]="foundation"  >
+                                    
+                                                    {{foundation.Foundation_Name}}
+                                    
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                        </form>
                             </div>
 
                             <div class="row">

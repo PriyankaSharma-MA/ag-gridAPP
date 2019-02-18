@@ -1,45 +1,48 @@
-
 <div id="example-wrapper" class="example-wrapper">
-    <div class="gridcontainer" layout-xs="column" layout="row" >
-<div class="headercontainer">
- <div class="foundationname">{{foundationname}}</div>
-    <div style="float:right;margin-right:30px;display:none">
-              <button type="button" style="font-size:12px" (click)="saveState()" class="btn btn-primary px-4 button-round-corners button-width">Save State</button>
+    <div class="gridcontainer" layout-xs="column" layout="row">
+        <div class="headercontainer">
+            <div class="logo"><img  src="{{siteurl}}//assets/fslogo.png"></div>
+            <div class="foundationname">{{foundationname}}</div>
+           
+            <div style="float:right;margin-right:30px;;padding-top: 8px;">
 
-    </div>
-    <div style="float:right;margin-right:30px;display:none">
+                <button type="button" style="font-size:12px" (click)="restoreState()" class="btn btn-primary px-4 button-round-corners button-width">Resotre
+                    State</button>
 
-        <button type="button" style="font-size:12px" (click)="restoreState()" class="btn btn-primary px-4 button-round-corners button-width">Resotre State</button>
+            </div>
+            <div style="float:right;margin-right:30px;;padding-top: 8px;">
+                <button type="button" style="font-size:12px" (click)="saveState()" class="btn btn-primary px-4 button-round-corners button-width">Save
+                    State</button>
 
-    </div>
-    <div style="float:right;margin-right:30px;">
-            <button type="button" style="font-size:12px" (click)="logout()" class="btn btn-primary px-4 button-round-corners button-width">Switch Foundation</button>
+            </div>
+            <div style="float:right;margin-right:30px;padding-top: 8px;">
+                <button type="button" style="font-size:12px" (click)="logout()" class="btn btn-primary px-4 button-round-corners button-width">Switch
+                    Foundation</button>
+
+            </div>
 
         </div>
+        <div class="filtercontainer  ui-inputtext">
+            <div style="float:right;margin-right:30px;">
+                <form [formGroup]="searchView" fxFlex fxLayout="column" autocomplete="off">
+                    <mat-form-field>
+                        <mat-select formControlName="view" multiple [(ngModel)]="selectedView" name="selectedView"
+                            placeholder="Select a view">
 
-</div>
-<div  class="filtercontainer  ui-inputtext" >
-   <div style="float:right;margin-right:30px;">
-        <form [formGroup]="searchView" fxFlex fxLayout="column" autocomplete="off">
-    <mat-form-field>
-        <mat-select formControlName="view" multiple [(ngModel)]="selectedView" name="selectedView"
-            placeholder="Select a view">
+                            <mat-option #allViewSelected [value]="0" (click)="toggleAllSelection()">All</mat-option>
+                            <mat-option *ngFor="let view of listView" [value]="view.value" (click)="togglePerOne()">
 
-            <mat-option #allViewSelected [value]="0" (click)="toggleAllSelection()">All</mat-option>
-            <mat-option *ngFor="let view of listView" [value]="view.value"  (click)="togglePerOne()">
+                                {{view.label}}
 
-                {{view.label}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </form>
+            </div>
+        </div>
+        <div class="grid-wrapper holds-the-iframe">
 
-            </mat-option>
-        </mat-select>
-    </mat-form-field>
-    </form>
+        </div>
+        <div id="myGrid" class="ag-theme-balham"></div>
+    </div>
 </div>
-</div>
-<div  class="grid-wrapper holds-the-iframe" >      
-
-</div>
-<div id="myGrid"  class="ag-theme-balham"></div>
-</div>
-</div>
-
