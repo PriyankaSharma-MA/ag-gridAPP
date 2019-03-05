@@ -27,14 +27,28 @@ export class MasterService {
             //.catch(this.handleError)
             ;
     }
-    GetgridViewState(): Observable<[]> {
+    DeleteGridViewState(id) {
         //Create header object
         let headers = new HttpHeaders();
         //Mention http header details
         let finalheaders = headers.append('Content-Type', 'application/json');
         finalheaders.append("Access-Control-Allow-Origin", "true")
+
+        //let body = JSON.stringify(id);
+        //Call the put function
+        return this.http.post<any>(this.webApiUrl + "DeletegridViewState?id="+ id, { headers: finalheaders })
+            //.catch(this.handleError)
+            ;
+    }
+    GetgridViewState(getgridViewStateParam,id,foundationId): Observable<[]> {
+        //Create header object
+        let headers = new HttpHeaders();
+        //Mention http header details
+        let finalheaders = headers.append('Content-Type', 'application/json');
+        finalheaders.append("Access-Control-Allow-Origin", "true")
+        let body = JSON.stringify(getgridViewStateParam);
         //Call the get function
-        return this.http.get<[]>(this.webApiUrl + "GetgridViewState", { headers: finalheaders })
+        return this.http.get<[]>(this.webApiUrl + "GetgridViewState?id="+ id + "&foundationId="+ foundationId, { headers: finalheaders,params:getgridViewStateParam,observe: 'body'})
            // .catch(this.handleError);
     }
     GetGridViewData(foundationId,viewId): Observable<[]> {

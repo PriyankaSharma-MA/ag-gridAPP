@@ -40,6 +40,7 @@
     "roboto-fontface": "^0.9.0",
     "rxjs": "^6.3.3",
     "rxjs-compat": "^6.2.1",
+    "sumoselect": "^3.0.5",
     "tslib": "^1.9.0",
     "zone.js": "~0.8.26"
   },

@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 import { MatSelectModule } from '@angular/material/select';
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -14,6 +15,9 @@ import { ViewComponent } from './view/view.component';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { AppRoutingModule }        from './app-routing.module';
 import { AuthGuard } from './_guards/auth.guard';
+import { DialogModule } from 'primeng/dialog';
+import { TableModule } from 'primeng/table';
+import { MessagesModule } from 'primeng/messages';
 LicenseManager.setLicenseKey("Foundation_Source_Philanthropic_Inc__Foundation_Source___3Devs2_SaaS_21_December_2019__MTU3Njg4NjQwMDAwMA==ee8b7707231e7b40f6e71ec9bf87a7f1");
 
 @NgModule({
@@ -34,6 +38,9 @@ LicenseManager.setLicenseKey("Foundation_Source_Philanthropic_Inc__Foundation_So
     ReactiveFormsModule,
     BrowserAnimationsModule,
     NgxMatSelectSearchModule,
+    DialogModule,
+    TableModule,
+    MessagesModule,
     AgGridModule.withComponents([])
   
   ],

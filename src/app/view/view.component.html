@@ -1,48 +1,109 @@
+<div class="message">
+    <p-messages oncomplete="setTimeout(function() { $('#msgs').html(''); }, 3000);" [(value)]="gridStateMsg" id="msgs">
+    </p-messages>
+</div>
+
 <div id="example-wrapper" class="example-wrapper">
     <div class="gridcontainer" layout-xs="column" layout="row">
-        <div class="headercontainer">
-            <div class="logo"><img  src="{{siteurl}}//assets/fslogo.png"></div>
-            <div class="foundationname">{{foundationname}}</div>
-           
-            <div style="float:right;margin-right:30px;;padding-top: 8px;">
+        <div id="headercontainer" class="headercontainer">
+            <div class="logo"><img src="{{siteurl}}//assets/fslogo.png"></div>
 
-                <button type="button" style="font-size:12px" (click)="restoreState()" class="btn btn-primary px-4 button-round-corners button-width">Resotre
-                    State</button>
+            <div class="navbar-foundation-name "><span>{{foundationname}}</span></div>
 
-            </div>
-            <div style="float:right;margin-right:30px;;padding-top: 8px;">
-                <button type="button" style="font-size:12px" (click)="saveState()" class="btn btn-primary px-4 button-round-corners button-width">Save
-                    State</button>
-
-            </div>
-            <div style="float:right;margin-right:30px;padding-top: 8px;">
-                <button type="button" style="font-size:12px" (click)="logout()" class="btn btn-primary px-4 button-round-corners button-width">Switch
+            {{choosedView }} {{ IsUpdateview}}
+            <div style="float:right;margin-right:30px;padding-top: 10px;">
+                <button type="button" (click)="logout()"
+                    class="btn btn-primary px-4 button-round-corners button-width">Switch
                     Foundation</button>
 
             </div>
 
         </div>
-        <div class="filtercontainer  ui-inputtext">
-            <div style="float:right;margin-right:30px;">
-                <form [formGroup]="searchView" fxFlex fxLayout="column" autocomplete="off">
-                    <mat-form-field>
-                        <mat-select formControlName="view" multiple [(ngModel)]="selectedView" name="selectedView"
-                            placeholder="Select a view">
+        <div id="filtercontainer" class="filtercontainer  ui-inputtext">
+            <div style="float:left;padding-left:10px;width:1083px"> <select multiple="multiple" name="somename4"
+                    class="testselect7 " style="display: block">
+                    <option selected="selected" value="1">Grant_View</option>
+                    <!-- <option *ngFor="let view of listView"  selected="selected" value="1">   {{view.label}}</option> -->
 
-                            <mat-option #allViewSelected [value]="0" (click)="toggleAllSelection()">All</mat-option>
-                            <mat-option *ngFor="let view of listView" [value]="view.value" (click)="togglePerOne()">
-
-                                {{view.label}}
-
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                </form>
+                </select>
             </div>
+            <div class="btn-group saved-list-view" style="float:left;display: inline-block;padding-top:2px;">
+                <div type="text" style="width:150px;height:34px"
+                    class="ember-power-select-trigger saved-list-view-trigger" data-toggle="dropdown">
+
+                    <span class="ember-power-select-selected-item">{{choosedView}}</span>
+                    <span style="line-height: 28px;" class="fa fa-caret-down fa-lg pull-right"></span> </div>
+                <div class="col-sm-12 dropdown-menu saved-list-view-dropdown ember-power-select-dropdown">
+                    <input [(ngModel)]="viewname" type="text" placeholder="Save current view as..." maxlength="256"
+                        id="ember8811"
+                        class="txtview form-control ember-power-select-search-input ember-text-field ember-view" />
+
+                    <button [disabled]="!(viewname != undefined && viewname.length > 0)"
+                        class="pull-right btn btn-primary" data-ember-action="" data-ember-action-8812="8812"
+                        (click)="saveState()"><i class="fa fa-save"></i> Add</button>
+                    <table>
+                        <tr class="saved-list-view-row">
+                            <td class="saved-list-view-option" colspan="2"><a style="cursor: pointer;"
+                                    (click)="getDefaultState('Default view')">Default
+                                    view</a></td>
+                        </tr>
+                        <tr class="saved-list-view-row" *ngFor="let view of viewlist">
+
+                            <td class="saved-list-view-option"><a style="cursor: pointer;"
+                                    (click)="restoreState(view.Id,view.ViewName)">{{view.ViewName}}</a></td>
+                            <td class="saved-list-view-actions">
+
+
+                                <span *ngIf="view.ViewName== choosedView && IsUpdateview==false"
+                                    class="fa fa-save tag-icon-xs m-r-sm disabled" style="margin-right:7px;"></span>
+                                <a *ngIf="view.ViewName== choosedView && IsUpdateview==true"
+                                    class="fa fa-trash tag-icon-xs" style="cursor: pointer" (click)="updateState()"></a>
+                                <a class="fa fa-trash tag-icon-xs" style="cursor: pointer"
+                                    (click)="deleteConfirm(view.Id,view.ViewName)"></a>
+
+
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+
+
         </div>
         <div class="grid-wrapper holds-the-iframe">
 
         </div>
-        <div id="myGrid" class="ag-theme-balham"></div>
+        <div id="myGrid" class="myGrid ag-theme-balham" style="width: 100%;"></div>
+
     </div>
 </div>
+
+<p-dialog [(visible)]="display" [width]="600" [transitionOptions]="'0ms'">
+
+    <p-header>
+        <!-- <h4 class="modal-title"> -->
+        <span><strong>Please Confirm</strong></span>
+        <!-- </h4> -->
+    </p-header>
+
+    <div class="modal-body">
+        <h4 class="text-center">{{confirmMsg}}</h4>
+    </div>
+    <p-footer>
+        <div class="modal-footer">
+            <button class="btn btn-outline test-cancel-action m-r-sm" (click)="hideDialog()">
+                <i class="fa fa-thumbs-down"></i>
+                Cancel</button>
+            <div class="pull-right">
+                <button *ngIf="IsUpdated" class="btn btn-primary test-confirm-action" (click)="updateState()">
+                    <i class="fa fa-thumbs-up"></i>
+                    Confirm</button>
+                <button *ngIf="IsDeleted" class="btn btn-primary test-confirm-action" (click)="deleteGridViewState()">
+                    <i class="fa fa-thumbs-up"></i>
+                    Confirm</button>
+
+            </div>
+        </div>
+    </p-footer>
+</p-dialog>

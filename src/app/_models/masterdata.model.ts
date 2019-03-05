@@ -5,7 +5,22 @@ export class FoundationList {
 }
 
 
+export class GetgridViewStateParam {
+      Id :number;
+      FoundationId :number;
+}
 export class InputGridViewstate {
-   CoulmnName :string;
-   CoulmnValue :string;
+      Id:number;
+      UserId: number;
+      ViewName: string;
+      FoundationId: number;
+      ViewId: string;
+      ColState: string;
+      GroupState: string;
+      SortState: string;
+      FilterState: string;
+      IsPivotMode: boolean;
+      IsDefault: boolean;
+      IsDeleted: boolean;
+
 }

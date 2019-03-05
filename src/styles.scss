@@ -4,7 +4,8 @@
 @import "~ag-grid-community/dist/styles/ag-theme-balham.css";
 
 @import "node_modules/bootstrap/scss/bootstrap";
-@import '~bootstrap/scss/bootstrap-reboot';
+
+// @import '~bootstrap/scss/bootstrap-reboot';
 @import '~bootstrap/scss/bootstrap-grid';
 .holds-the-iframe {
     background:url('assets/loader.gif') center center no-repeat;
@@ -16,11 +17,84 @@
     width: 100%;
     /* margin-bottom: 11px; */
     height: 48px;
+    background-color: #0070a4;
     // background: url('assets/fslogo.png') center center no-repeat;
   
 }
 
-body{
+body {
+    font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
+    font-weight: 400;
     -ms-content-zooming: none;
 }
+/* aggrid style  */
+.ag-grid-cellClass{
+    font-size:14px !important;
+}
+.ag-grid-cellNumber{
+    font-size:14px !important;
+    float:right;
+}
+.ag-pivot-off .ag-header-group-cell{
+    font-size: 14px;
 
+}
+
+.ag-pivot-on .ag-header-group-cell{
+    font-size: 14px;
+
+}
+.ag-header-row{
+    font-size: 14px;
+}
+.ag-theme-balham{
+    font-size: 14px;
+}
+.ag-theme-balham .ag-primary-cols-header-panel {
+    border-bottom: 1px solid #BDC3C7;
+    box-sizing: border-box;
+    min-height: 32px !important;
+    /* padding-top: 4px; */
+}
+.ag-theme-balham .ag-side-bar .ag-column-drop {
+    min-height: 80px;
+}
+.ag-column-panel{
+    min-height: 500px !important;
+}
+.ag-theme-balham .ag-side-bar .ag-column-drop {
+    min-height: 80px !important;
+}
+.SumoSelect .select-all{
+    height:35px !important;
+}
+.SumoSelect > .optWrapper.multiple > .MultiControls > p.btnOk {
+    border-right: 1px solid #DBDBDB;
+    border-radius: 0 0 0 3px;
+    background-color: #3c8dbc;
+    color: #FFFFFF;
+}
+.SumoSelect > .optWrapper.multiple > .MultiControls > p.btnCancel {
+    border-radius: 0 0 3px 0;
+    color: #006EBB;
+}
+.SumoSelect > .CaptionCont {
+    position: relative;
+    border: 1px solid #d2d6de;
+    min-height: 35px !important;
+    background-color: #fff;
+    border-radius: 2px;
+    margin: 0;
+    font-size:14px!important;
+}
+.SumoSelect > .optWrapper.multiple > .MultiControls > p:hover
+{
+    background-color: #3c8dbc !important;
+}
+
+// .SumoSelect > .optWrapper.multiple > .MultiControls >.btnCancel> p:hover {
+//     background-color: #f1f1f1 !important;
+// }
+.SumoSelect{
+    padding-top: 2px!important;
+}

@@ -6,11 +6,15 @@ import { Grid, GridOptions } from "ag-grid-community";
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { MasterService } from '../../app/_services/masterdata.service'
 import { InputGridViewstate } from '../../app/_models/masterdata.model'
+import { GetgridViewStateParam } from '../../app/_models/masterdata.model'
 import "ag-grid-enterprise";
 import { SelectItem } from 'primeng/api';
 import { Router } from '@angular/router';
 import { MatOption } from '@angular/material';
 import { environment } from '../../environments/environment';
+import { Message } from 'primeng/components/common/api';
+declare function attachSumoSelect(): any;
+declare function aggridcss(): any; 
 @Component({
   selector: 'app-view',
   templateUrl: './view.component.html',
@@ -28,27 +32,45 @@ export class ViewComponent implements OnInit {
   inputGridViewstate: InputGridViewstate[] = [];
   private gridOptions: GridOptions = <GridOptions>{};
   foundationId: string;
-  selectedView: string[];
+  selectedDropdownView: string[];
   listView: SelectItem[];
   title = 'my-app';
   count = 0;
   rowDatavalues: [];
   colDatavalues: [];
-
+  isdivviewnameVisible: boolean = false;
+  viewname: string;
+  viewlist: [];
+  choosedView: string = "Default view";
+  display: boolean = false;
+  getgridViewStateParam: GetgridViewStateParam[] = []
+  gridStateMsg: Message[] = [];
+  confirmMsg: "";
+  selectedViewId: 0;
+  selectedViewName: "";
+  IsUpdated: boolean = true;
+  IsDeleted: boolean = false;
+   IsUpdateview:number=0;;
   constructor(private fb: FormBuilder, private router: Router, private masterService: MasterService) {
     this.createCoulmnData()
   }
+  showDialog() {
+    this.isdivviewnameVisible = true;
+  }
+
   createGridOption() {
 
     var groupColumn = {
-      headerName: "Group",
+      //headerName: "Group",
       width: 200,
       field: 'name',
       headerCheckboxSelection: true,
       headerCheckboxSelectionFilteredOnly: true,
       cellRenderer: 'agGroupCellRenderer',
+
       cellRendererParams: {
-        checkbox: true
+        suppressCount: true,
+        checkbox: false
       }
     };
 
@@ -64,13 +86,14 @@ export class ViewComponent implements OnInit {
         ]
       },
 
+
       defaultExportParams: {
         columnGroups: true
       },
 
       enableCellChangeFlash: true,
       rowDragManaged: true,
-      pivotMode: true,
+      pivotMode: false,
 
       // popupParent: document.body,
       // ensureDomOrder: true,
@@ -104,7 +127,7 @@ export class ViewComponent implements OnInit {
       // domLayout: 'autoHeight',
       // domLayout: 'forPrint',
       // groupUseEntireRow: true, //one of [true, false]
-      // groupDefaultExpanded: 9999, //one of [true, false], or an integer if greater than 1
+      groupDefaultExpanded: 2, //one of [true, false], or an integer if greater than 1
       // headerHeight: 100, // set to an integer, default is 25, or 50 if grouping columns
       // groupSuppressAutoColumn: true,
       // groupSuppressBlankHeader: true,
@@ -122,13 +145,14 @@ export class ViewComponent implements OnInit {
       animateRows: true,
       enableColResize: true, //one of [true, false]
       enableSorting: true, //one of [true, false]
-      enableFilter: false, //one of [true, false]
+      enableFilter: true, //one of [true, false]
       enableRangeSelection: true,
       rowSelection: "multiple", // one of ['single','multiple'], leave blank for no selection
       rowDeselection: true,
       quickFilterText: null,
       groupSelectsChildren: true, // one of [true, false]
       pagination: true,
+
       // embedFullWidthRows: true,
       // groupSelectsFiltered: true,
       suppressRowClickSelection: true, // if true, clicking rows doesn't select (useful for checkbox selection)
@@ -150,8 +174,8 @@ export class ViewComponent implements OnInit {
       // groupSuppressAutoColumn: true,
       // contractColumnSelection: true,
       // groupAggFields: ['bankBalance','totalWinnings'],
-      // groupMultiAutoColumn: true,
-      // groupHideOpenParents: true,
+      groupMultiAutoColumn: true,
+      groupHideOpenParents: true,
       // suppressMenuFilterPanel: true,
       // clipboardDeliminator: ',',
       // suppressMenuMainPanel: true,
@@ -168,22 +192,7 @@ export class ViewComponent implements OnInit {
           return 0;
         }
       },
-      getBusinessKeyForNode: function (node) {
-        if (node.data) {
-          return node.data.name;
-        } else {
-          return '';
-        }
-      },
-      defaultGroupSortComparator: function (nodeA, nodeB) {
-        if (nodeA.key < nodeB.key) {
-          return -1;
-        } else if (nodeA.key > nodeB.key) {
-          return 1;
-        } else {
-          return 0;
-        }
-      },
+      
       // rowHeight: 100,
       // suppressTabbing: true,
       // rowHoverClass: true,
@@ -192,11 +201,19 @@ export class ViewComponent implements OnInit {
       // callback when row clicked
       //     stopEditingWhenGridLosesFocus: true,
       onRowClicked: function (params) {
+        
         // console.log("Callback onRowClicked: " + (params.data?params.data.name:null) + " - " + params.event);
       },
-      // onSortChanged: function (params) {
-      //     console.log("Callback onSortChanged");
-      // },
+      onDisplayedColumnsChanged:function (params) {
+        this.valuechange();
+        this.IsUpdateview=1;
+      
+        //alert(params)
+        // console.log("Callback onRowClicked: " + (params.data?params.data.name:null) + " - " + params.event);
+      },
+      onSortChanged: function (params) {
+          console.log("Callback onSortChanged");
+      },
       onRowDoubleClicked: function (params) {
         // console.log("Callback onRowDoubleClicked: " + params.data.name + " - " + params.event);
       },
@@ -243,9 +260,11 @@ export class ViewComponent implements OnInit {
         //this.gridColumnApi = event.columnApi;
 
 
-        // event.api.addGlobalListener(function(type, event) {
-        //console.log('event ' + type);
-        //});
+        event.api.addGlobalListener(function (type, event) {
+          console.log('type ' + type);
+          console.log('event ' + event)
+        });
+
       },
       onRowGroupOpened: function (event) {
         console.log('Callback onRowGroupOpened: node = ' + event.node.key + ', ' + event.node.expanded);
@@ -253,46 +272,16 @@ export class ViewComponent implements OnInit {
       onRangeSelectionChanged: function (event) {
         // console.log('Callback onRangeSelectionChanged: finished = ' + event.finished);
       },
-      getContextMenuItems: this.getContextMenuItems,
-      excelStyles: [
-        {
-          id: 'good-score',
-          interior: {
-            color: "#C6EFCE", pattern: 'Solid'
-          },
-          numberFormat: {
-            format: '[$$-409]#,##0'
-          }
-        },
-        {
-          id: 'bad-score',
-          interior: {
-            color: "#FFC7CE", pattern: 'Solid'
-          },
-          numberFormat: {
-            format: '[$$-409]#,##0'
-          }
-        },
-        {
-          id: 'header',
-          interior: {
-            color: "#CCCCCC", pattern: 'Solid'
-          }
-        },
-        {
-          id: 'currencyCell',
-          numberFormat: {
-            format: '[$$-409]#,##0'
-          }
-        },
-        {
-          id: 'booleanType',
-          dataType: 'boolean'
-        }
-      ]
+ 
+     
     };
     this.createGrid();
   }
+valuechange()
+{
+  this.IsUpdateview=1;
+  
+}
   getSessionData() {
 
     this.foundationId = JSON.parse(localStorage.getItem('foundationId'));
@@ -317,24 +306,9 @@ export class ViewComponent implements OnInit {
   selectionChanged(event) {
     console.log('Callback selectionChanged: selection count = ' + this.gridOptions.api.getSelectedNodes().length);
   }
-  getContextMenuItems(params) {
-    if (params.node == null) return null;
-    var result = params.defaultItems.splice(0);
-    result.push(
-      {
-        name: 'Custom Menu Item',
-        icon: '<img src="images/lab.svg" style="width: 14px;"/>',
-        //shortcut: 'Alt + M',
-        action: function () {
-          var value = params.value ? params.value : '<empty>';
-          window.alert('You clicked a custom menu item on cell ' + value);
-        }
-      }
-    );
-
-    return result;
-  }
+ 
   ngOnInit() {
+    attachSumoSelect();
     this.searchView = this.fb.group({
 
       view: new FormControl('')
@@ -353,19 +327,44 @@ export class ViewComponent implements OnInit {
     let eGridDiv: HTMLElement = document.querySelector('#myGrid');
 
     new Grid(eGridDiv, this.gridOptions);
+    aggridcss();
   }
-  restoreState() {
-
-
-    this.masterService.GetgridViewState().subscribe(
+  restoreState(id, name) {
+    this.getgridViewStateParam = [];
+    this.getgridViewStateParam.push({ Id: id, FoundationId: parseInt(this.foundationId) })
+    this.masterService.GetgridViewState(this.getgridViewStateParam, id, this.foundationId).subscribe(
       data => {
-
-        this.setstate(data)
+        this.choosedView = name;
+        this.setGridState(data)
       }
     )
 
   }
-  setstate(data) {
+  getSavedView() {
+    this.getgridViewStateParam = [];
+    this.getgridViewStateParam.push({ Id: 0, FoundationId: parseInt(this.foundationId) })
+    this.masterService.GetgridViewState(this.getgridViewStateParam, 0, this.foundationId).subscribe(
+      data => {
+        this.viewlist = data;
+      }
+    )
+  }
+  getDefaultState(name) {
+    var defaultGridViewState = [];
+    defaultGridViewState = JSON.parse(localStorage.getItem('defaultGridViewState'));
+
+    console.log(defaultGridViewState)
+    this.setGridState(defaultGridViewState);
+    this.choosedView = name;
+
+  }
+  saveDefaultState() {
+    this.getGridViewState();
+    localStorage.setItem('defaultGridViewState', JSON.stringify(this.inputGridViewstate));
+    console.log(JSON.stringify(this.inputGridViewstate))
+
+  }
+  setGridState(data) {
 
     this.gridOptions.columnApi.setPivotMode(data[0].IsPivotMode)
     this.gridOptions.columnApi.setColumnState(JSON.parse(data[0].ColState));
@@ -373,35 +372,123 @@ export class ViewComponent implements OnInit {
     this.gridOptions.api.setSortModel(JSON.parse(data[0].SortState));
     this.gridOptions.api.setFilterModel(JSON.parse(data[0].FilterState));
   }
-  saveState() {
+  getGridViewState() {
     var isPivotMode = this.gridOptions.columnApi.isPivotMode();
     var colState = this.gridOptions.columnApi.getColumnState();
     var groupState = this.gridOptions.columnApi.getColumnGroupState();
     var sortState = this.gridOptions.api.getSortModel();
     var filterState = this.gridOptions.api.getFilterModel();
-    var autosize = this.gridOptions.columnApi.getState();
-
+    //var autosize = this.gridOptions.columnApi.getState();
+    console.log(colState)
     this.inputGridViewstate = []
     this.inputGridViewstate.push(
-      { CoulmnName: "colState", CoulmnValue: JSON.stringify(colState) },
-      { CoulmnName: "groupState", CoulmnValue: JSON.stringify(groupState) },
-      { CoulmnName: "sortState", CoulmnValue: JSON.stringify(sortState) },
-      { CoulmnName: "filterState", CoulmnValue: JSON.stringify(filterState) },
-      { CoulmnName: "isPivotMode", CoulmnValue: isPivotMode.toString() }
+      {
+        Id: this.selectedViewId, UserId: 1, ViewName: this.viewname, FoundationId: parseInt(this.foundationId), ViewId: "1"
+        , ColState: JSON.stringify(colState), GroupState: JSON.stringify(groupState), SortState: JSON.stringify(sortState)
+        , FilterState: JSON.stringify(filterState), IsPivotMode: isPivotMode
+        , IsDefault: true, IsDeleted: false
+      }
+
     )
+  }
+  updateState()
+  {
+    this.IsUpdated=true;
+    this.IsDeleted=false;
+
+    this.getGridViewState()
     this.masterService.SaveGridViewState(this.inputGridViewstate).subscribe(
       data => {
         this.response = data;
-        alert(this.response)
+        var msg = ""
+        // alert(data)
+        
+          this.hideDialog();
+          msg = this.viewname + " saved";
+          this.gridStateMsg.push({ severity: "success", summary: '', detail: msg });
+          this.viewname = "";
+          this.getSavedView();
+       
+
 
       })
 
     error => {
-      //  this.showSuccessMsg('error', this.response)
+
       console.error("Error updating status!");
     }
-    console.log(colState)
+ 
+  }
+  saveState() {
+    this.IsUpdated=true;
+    this.IsDeleted=false;
 
+    this.getGridViewState()
+    this.masterService.SaveGridViewState(this.inputGridViewstate).subscribe(
+      data => {
+        this.response = data;
+        var msg = ""
+        // alert(data)
+        if (data == "0") {
+          this.hideDialog();
+          msg = this.viewname + " saved";
+          this.gridStateMsg.push({ severity: "success", summary: '', detail: msg });
+          this.viewname = "";
+          this.getSavedView();
+        } else {
+          this.selectedViewId = data;
+          msg = 'A view named ' + '"' + this.viewname + '"' + ' already exists.Replace?'
+          this.showConfirmDialogue(msg)
+        }
+
+
+      })
+
+    error => {
+
+      console.error("Error updating status!");
+    }
+
+
+  }
+  showConfirmDialogue(msg) {
+    this.display = true;
+    this.confirmMsg = msg;
+  }
+  hideDialog() {
+    this.display = false;
+  }
+  deleteConfirm(viewid, viewname) {
+    this.IsUpdated=false;
+    this.IsDeleted=true;
+    this.selectedViewId=viewid;
+    this.selectedViewName=viewname;
+    var msg = "Are you sure you want to delete " + '"' + this.selectedViewName + '"' + "?"
+    this.showConfirmDialogue(msg);
+  }
+  deleteGridViewState() {
+    this.masterService.DeleteGridViewState(this.selectedViewId).subscribe(
+      data => {
+        this.response = data;
+        // alert(this.response)
+        this.hideDialog();
+        var msg = this.selectedViewName + " deleted";
+        this.gridStateMsg.push({ severity: "success", summary: '', detail: msg });
+        this.getSavedView();
+
+      })
+
+    error => {
+
+      console.error("Error updating status!");
+    }
+  }
+  resetValue()
+  {
+    this.selectedViewId=0;
+    this.selectedViewName="";
+    this.IsUpdated=true;
+    this.IsDeleted=false;
   }
   onDropDownChange() {
 
@@ -416,7 +503,7 @@ export class ViewComponent implements OnInit {
     } else {
       this.searchView.controls.view.patchValue([]);
     }
-    this.selectedView = this.searchView.controls.view.value;
+    this.selectedDropdownView = this.searchView.controls.view.value;
 
 
   }
@@ -425,7 +512,7 @@ export class ViewComponent implements OnInit {
 
     if (this.allViewSelected.selected) {
       this.allViewSelected.deselect();
-      this.selectedView = this.searchView.controls.view.value;
+      this.selectedDropdownView = this.searchView.controls.view.value;
       //this.createRowData();
       return false;
     }
@@ -433,8 +520,9 @@ export class ViewComponent implements OnInit {
       this.allViewSelected.select();
 
     }
-    this.selectedView = this.searchView.controls.view.value;
+    this.selectedDropdownView = this.searchView.controls.view.value;
     //this.createRowData();
+    this.getDefaultState("Default view")
   }
   bindViewDropdown() {
     var temp = []
@@ -451,7 +539,7 @@ export class ViewComponent implements OnInit {
       });
     }
 
-    this.selectedView = [this.listView[0].value]
+    this.selectedDropdownView = [this.listView[0].value]
 
 
   }
@@ -472,7 +560,127 @@ export class ViewComponent implements OnInit {
       var attributename = []
       var attributecategory = []
 
-      if (splitviewname[1] == this.selectedView) {
+      if (splitviewname[1] == this.selectedDropdownView) {
+        var myObjects = Object.keys(temp).map(itm => temp[itm]);
+
+        tempchild = myObjects[j]
+        var categorytempchild = []
+        for (var l = 0; l < Object.keys(tempchild).length; l++) {
+
+          attributename = []
+          attributecategory = []
+          var categorytempchildtmp = Object.keys(tempchild).map(itm => tempchild[itm]);
+
+          categorytempchild = categorytempchildtmp[l]
+          for (var m = 0; m < Object.keys(categorytempchild).length; m++) {
+            attributecategory = []
+            var tmlastarr = Object.keys(categorytempchild).map(itm => categorytempchild[itm]);
+            //var count = tmlastarr[m].length
+            var count = Object.keys(categorytempchild).length
+            for (var k = 0; k < count; k++) {
+
+            //  splitattributename = tmlastarr[m][k].split('|');
+              splitattributename = tmlastarr[k].split('|');
+              agfilter = "agSetColumnFilter"
+              headername = splitattributename[0]
+              headerDataType = splitattributename[1]
+              if (headerDataType == "Date") {
+                agfilter = "agDateColumnFilter"
+              }
+
+              var Isfilter = splitattributename[2].toLowerCase() == 'true' ? false : true;
+              if (headerDataType == "Date") {
+                attributecategory.push({
+                  headerName: headername, field: headername, suppressFilter: Isfilter, filter: agfilter
+                  , width: 120, editable: false, floatCell: true, enableValue: true, enableRowGroup: true
+                  , cellClass: 'ag-grid-cellClass', enablePivot: true, cellStyle: { textAlign: "center" },
+                  filterParams: {
+                    comparator: function (filterLocalDateAtMidnight, cellValue) {
+                      console.log(filterLocalDateAtMidnight)
+                      var dateAsString = cellValue;
+                      if (dateAsString == null) return -1;
+                      var dateParts = dateAsString.split("/");
+                      //var day = Number(dateParts[1]);
+                      // var month = Number(dateParts[0]) ;
+                      // var year = Number(dateParts[2]);
+                      // var cellDate1 = new Date(day,month,year);
+                      //  var cellDate2= new Date(year,month,day);
+
+                      var cellDate = new Date(Number(dateParts[2]), Number(dateParts[0]), Number(dateParts[1]));
+
+                      if (filterLocalDateAtMidnight.getTime() == cellDate.getTime()) {
+                        return 0
+                      }
+
+                      if (cellDate < filterLocalDateAtMidnight) {
+                        return -1;
+                      }
+
+                      if (cellDate > filterLocalDateAtMidnight) {
+                        return 1;
+                      }
+                    },
+                    browserDatePicker: true
+                  }
+                })
+              } else if (headerDataType == "Amount") {
+                attributecategory.push({
+                  headerName: headername, field: headername, suppressFilter: Isfilter, filter: agfilter
+                  , enablePivot: true, enableRowGroup: true, width: 120, editable: false, floatCell: true, enableValue: true, cellClass: 'ag-grid-cellNumber'
+                  , cellStyle: { textAlign: "right" }, valueFormatter: function (cellValue) {
+
+                    if (cellValue.value == null) {
+
+                      return "";
+                    } else {
+
+                      return "$" + parseFloat(cellValue.value).toFixed(2)
+                        .toString()
+                        .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+
+                    }
+                  }
+                })
+              } else {
+                attributecategory.push({
+                  headerName: headername, field: headername, suppressFilter: Isfilter, filter: agfilter
+                  , enablePivot: true, enableRowGroup: true, width: 120, editable: false, floatCell: true, enableValue: true, cellClass: 'ag-grid-cellClass'
+
+                })
+              }
+            }
+           // attributename.push({ headerName: Object.keys(categorytempchild)[m], children: attributecategory })
+
+          }
+          coldef.push({ headerName: Object.keys(tempchild)[l], children: attributecategory })
+        //  coldef.push({ headerName: Object.keys(tempchild)[l], children: attributename })
+        }
+
+      }
+
+    }
+
+    return coldef;
+
+  }
+  createColumnDefs_old() {
+
+    var temp = []
+    var coldef = [];
+
+    temp = this.colDatavalues
+
+    var splitviewname = []
+    var headername, headerDataType;
+    var splitattributename = []
+    var agfilter = "agSetColumnFilter"
+    for (var j = 0; j < Object.keys(temp).length; j++) {
+      splitviewname = Object.keys(temp)[j].split('|')
+      var tempchild = []
+      var attributename = []
+      var attributecategory = []
+
+      if (splitviewname[1] == this.selectedDropdownView) {
         var myObjects = Object.keys(temp).map(itm => temp[itm]);
 
         tempchild = myObjects[j]
@@ -497,19 +705,73 @@ export class ViewComponent implements OnInit {
               headerDataType = splitattributename[1]
               if (headerDataType == "Date") {
                 agfilter = "agDateColumnFilter"
-                   }
-         
-          var Isfilter = splitattributename[2].toLowerCase( ) == 'true' ? false : true;
-              attributecategory.push({
-                headerName: headername, field: headername,suppressFilter: Isfilter,filter:agfilter
-                , width: 120, editable: true, floatCell: true, enableRowGroup: true, enablePivot: true, enableValue: true
+              }
 
-              })
+              var Isfilter = splitattributename[2].toLowerCase() == 'true' ? false : true;
+              if (headerDataType == "Date") {
+                attributecategory.push({
+                  headerName: headername, field: headername, suppressFilter: Isfilter, filter: agfilter
+                  , width: 120, editable: false, floatCell: true, enableValue: true, enableRowGroup: true
+                  , cellClass: 'ag-grid-cellClass', enablePivot: true, cellStyle: { textAlign: "center" },
+                  filterParams: {
+                    comparator: function (filterLocalDateAtMidnight, cellValue) {
+                      console.log(filterLocalDateAtMidnight)
+                      var dateAsString = cellValue;
+                      if (dateAsString == null) return -1;
+                      var dateParts = dateAsString.split("/");
+                      //var day = Number(dateParts[1]);
+                      // var month = Number(dateParts[0]) ;
+                      // var year = Number(dateParts[2]);
+                      // var cellDate1 = new Date(day,month,year);
+                      //  var cellDate2= new Date(year,month,day);
+
+                      var cellDate = new Date(Number(dateParts[2]), Number(dateParts[0]), Number(dateParts[1]));
+
+                      if (filterLocalDateAtMidnight.getTime() == cellDate.getTime()) {
+                        return 0
+                      }
+
+                      if (cellDate < filterLocalDateAtMidnight) {
+                        return -1;
+                      }
+
+                      if (cellDate > filterLocalDateAtMidnight) {
+                        return 1;
+                      }
+                    },
+                    browserDatePicker: true
+                  }
+                })
+              } else if (headerDataType == "Amount") {
+                attributecategory.push({
+                  headerName: headername, field: headername, suppressFilter: Isfilter, filter: agfilter
+                  , enablePivot: true, enableRowGroup: true, width: 120, editable: false, floatCell: true, enableValue: true, cellClass: 'ag-grid-cellNumber'
+                  , cellStyle: { textAlign: "right" }, valueFormatter: function (cellValue) {
+
+                    if (cellValue.value == null) {
+
+                      return "";
+                    } else {
+
+                      return "$" + parseFloat(cellValue.value).toFixed(2)
+                        .toString()
+                        .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+
+                    }
+                  }
+                })
+              } else {
+                attributecategory.push({
+                  headerName: headername, field: headername, suppressFilter: Isfilter, filter: agfilter
+                  , enablePivot: true, enableRowGroup: true, width: 120, editable: false, floatCell: true, enableValue: true, cellClass: 'ag-grid-cellClass'
+
+                })
+              }
             }
             attributename.push({ headerName: Object.keys(categorytempchild)[m], children: attributecategory })
 
           }
-          coldef.push({ headerName: Object.keys(tempchild)[l], children: attributename})
+          coldef.push({ headerName: Object.keys(tempchild)[l], children: attributename })
         }
 
       }
@@ -518,6 +780,19 @@ export class ViewComponent implements OnInit {
 
     return coldef;
 
+  }
+  currencyFormatter(params) {
+    if (params.value > 0) {
+      return "\xA3" + this.formatNumber(params.value);
+    } else {
+      return "\xA3" + (params.value);
+    }
+
+  }
+  formatNumber(number) {
+    return Math.floor(number)
+      .toString()
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
   }
 
 
@@ -538,6 +813,7 @@ export class ViewComponent implements OnInit {
         temp = data;
         console.log(Object.keys(temp)[0])
         this.bindViewDropdown();
+        this.getSavedView();
         this.createRowData()
       }
     )
@@ -545,20 +821,13 @@ export class ViewComponent implements OnInit {
   }
   createRowData() {
 
-    this.masterService.GetGridViewData(this.foundationId, this.selectedView).subscribe(
+    this.masterService.GetGridViewData(this.foundationId, this.selectedDropdownView).subscribe(
       data => {
         this.rowDatavalues = data;
         this.createGridOption()
+        this.saveDefaultState();
       }
     )
-    // this.masterService.GetFoundationName(this.foundationId).subscribe(
-    //   data => {
-    //      var result=[]
-    //      result=data;
-    //      this.foundationname = result[0].Foundation_Name.toString();
-
-    //   }
-    // )
 
   }
 }
